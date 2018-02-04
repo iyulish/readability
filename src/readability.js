@@ -1,8 +1,8 @@
-var jsdom = require('jsdom');
-var request = require('request');
+import jsdom from 'jsdom-jscore';
+//var request = require('request');
 var helpers = require('./helpers');
-var encodinglib = require("encoding");
-var urllib = require('url');
+//var encodinglib = require("encoding");
+//var urllib = require('url');
 
 exports.debug = function(debug) {
   helpers.debug(debug);
@@ -198,28 +198,18 @@ function _parseContentType(str) {
   };
 }
 
-function read(html, options, callback) {
-  if (typeof options === 'function') {
-    callback = options;
-    options = {};
-  }
+function read(html, callback) {
 
-  var overrideEncoding = options.encoding,
-      preprocess = options.preprocess;
+  //var parsedURL = urllib.parse(html);
+  //if (['http:', 'https:', 'unix:', 'ftp:', 'sftp:'].indexOf(parsedURL.protocol) === -1) {
+  //  jsdomParse(null, null, html);
+  //} else {
 
-  options.encoding = null;
-  delete options.preprocess;
-
-  var parsedURL = urllib.parse(html);
-  if (['http:', 'https:', 'unix:', 'ftp:', 'sftp:'].indexOf(parsedURL.protocol) === -1) {
-    jsdomParse(null, null, html);
-  } else {
-    request(html, options, function(err, res, buffer) {
-      if (err) {
-        return callback(err);
-      }
-
-      var content_type = _parseContentType(res.headers['content-type']);
+    fetch(html)
+    .then(response => response.text())
+    .then(webpage => {
+      jsdomParse(null, null, webpage);
+      /* var content_type = _parseContentType(response.headers['content-type']);
 
       if (content_type.mimeType == "text/html") {
         content_type.charset = _findHTMLCharset(buffer) || content_type.charset;
@@ -234,7 +224,7 @@ function read(html, options, callback) {
       buffer = buffer.toString();
 
       if (preprocess) {
-        preprocess(buffer, res, content_type, function(err, buffer) {
+        preprocess(webpage, res, content_type, function(err, buffer) {
           if (err) return callback(err);
           jsdomParse(null, res, buffer);
         });
@@ -251,34 +241,30 @@ function read(html, options, callback) {
 
     if (typeof body !== 'string') body = body.toString();
     if (!body) return callback(new Error('Empty story body returned from URL'));
-    jsdom.env({
-      html: body,
-      done: function(errors, window) {
-        if (meta) {
-          window.document.originalURL = meta.request.uri.href;
-        } else {
-          window.document.originalURL = null;
-        }
+    jsdom.env(body, function(errors, window) {
+      if (meta) {
+        window.document.originalURL = meta.request.uri.href;
+      } else {
+        window.document.originalURL = null;
+      }
 
-        if (errors) {
-          window.close();
-          return callback(errors);
-        }
-        if (!window.document.body) {
-          window.close();
-          return callback(new Error('No body tag was found.'));
-        }
+      if (errors) {
+        window.close();
+        return callback(errors);
+      }
+      if (!window.document.body) {
+        window.close();
+        return callback(new Error('No body tag was found.'));
+      }
 
-        try {
-          var readability = new Readability(window, options);
+      try {
+        var readability = new Readability(window, options);
+        // add meta information to callback
+        callback(null, readability, meta);
+      } catch (ex) {
+        //window.close();
+        return callback(ex);
 
-          // add meta information to callback
-          callback(null, readability, meta);
-        } catch (ex) {
-          window.close();
-          return callback(ex);
-
-        }
       }
     });
   }

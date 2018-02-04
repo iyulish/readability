@@ -1,4 +1,4 @@
-var url = require("url");
+//var url = require("url");
 
 // All of the regular expressions in use within readability.
 var regexps = {
@@ -505,7 +505,8 @@ function fixLinks(e) {
   }
 
   function fixLink(link) {
-    var fixed = url.resolve(e.ownerDocument.originalURL, link);
+    //var fixed = url.resolve(e.ownerDocument.originalURL, link);
+    var fixed =  e.ownerDocument.originalURL + '/' + link;
     return fixed;
   }
 
