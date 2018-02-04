@@ -22,7 +22,7 @@
     }
   ],
   "dependencies": {
-    "jsdom": "git://github.com/iyulish/jsdom-jscore.git"
+    "jsdom-jscore": "git://github.com/iyulish/jsdom-jscore.git"
   },
   "engines": {
     "node": ">= 2"
