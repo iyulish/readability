@@ -198,76 +198,28 @@ function _parseContentType(str) {
   };
 }
 
-function read(html, callback) {
+function read(url, callback) {
 
-  //var parsedURL = urllib.parse(html);
-  //if (['http:', 'https:', 'unix:', 'ftp:', 'sftp:'].indexOf(parsedURL.protocol) === -1) {
-  //  jsdomParse(null, null, html);
-  //} else {
-
-    fetch(html)
-    .then(response => response.text())
-    .then(webpage => {
-      jsdomParse(null, null, webpage);
-      /* var content_type = _parseContentType(response.headers['content-type']);
-
-      if (content_type.mimeType == "text/html") {
-        content_type.charset = _findHTMLCharset(buffer) || content_type.charset;
-      }
-
-      content_type.charset = (overrideEncoding || content_type.charset || "utf-8").trim().toLowerCase();
-
-      if (!content_type.charset.match(/^utf-?8$/i)) {
-        buffer = encodinglib.convert(buffer, "UTF-8", content_type.charset);
-      }
-
-      buffer = buffer.toString();
-
-      if (preprocess) {
-        preprocess(webpage, res, content_type, function(err, buffer) {
-          if (err) return callback(err);
-          jsdomParse(null, res, buffer);
-        });
-      } else {
-        jsdomParse(null, res, buffer);
-      }
-    });
-  }
-
-  function jsdomParse(error, meta, body) {
-    if (error) {
-      return callback(error);
-    }
-
-    if (typeof body !== 'string') body = body.toString();
-    if (!body) return callback(new Error('Empty story body returned from URL'));
-    jsdom.env(body, function(errors, window) {
-      if (meta) {
-        window.document.originalURL = meta.request.uri.href;
-      } else {
-        window.document.originalURL = null;
-      }
-
-      if (errors) {
-        window.close();
-        return callback(errors);
-      }
-      if (!window.document.body) {
-        window.close();
-        return callback(new Error('No body tag was found.'));
-      }
-
-      try {
-        var readability = new Readability(window, options);
-        // add meta information to callback
-        callback(null, readability, meta);
+  fetch(url)
+  .then(response => response.text())
+  .then(webpage => {
+    jsdom.env(webpage, function(errors, window) {
+      //var el = window.document.querySelector('body');
+      //self.renderChart(window, el);
+      try {         
+        var options = {};
+        options.encoding = null;
+        var article = new Readability(window, options);         
+        let dom = article.document;
+        let style = 'img {max-width: 100%; height: auto;}';
+        let html = '<html><head><style type="text/css">'+style+'</style><meta charset="utf-8"><title>'+dom.title+'</title></head><body><h1>'+article.title+'</h1>'+article.content+'</body></html>';
+        callback(null, html);
       } catch (ex) {
-        //window.close();
-        return callback(ex);
-
+        callback(ex);
       }
-    });
-  }
+
+    })
+  })
 }
 
 module.exports = read;
