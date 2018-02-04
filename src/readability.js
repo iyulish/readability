@@ -198,28 +198,28 @@ function _parseContentType(str) {
   };
 }
 
-function read(url, callback) {
-
-  fetch(url)
-  .then(response => response.text())
-  .then(webpage => {
-    jsdom.env(webpage, function(errors, window) {
-      //var el = window.document.querySelector('body');
-      //self.renderChart(window, el);
-      try {         
-        var options = {};
-        options.encoding = null;
-        var article = new Readability(window, options);         
-        let dom = article.document;
-        let style = 'img {max-width: 100%; height: auto;}';
-        let html = '<html><head><style type="text/css">'+style+'</style><meta charset="utf-8"><title>'+dom.title+'</title></head><body><h1>'+article.title+'</h1>'+article.content+'</body></html>';
-        callback(null, html);
-      } catch (ex) {
-        callback(ex);
-      }
-
-    })
-  })
+function read(url) {
+  return fetch(url)
+    .then(response => response.text())
+    .then(webpage => {
+      return new Promise(function(resolve, reject) { jsdom.env(webpage, function(errors, window) {
+          //var el = window.document.querySelector('body');
+          //self.renderChart(window, el);
+          try {         
+            var options = {};
+            options.encoding = null;
+            var article = new Readability(window, options);         
+            let dom = article.document;
+            let style = 'img {max-width: 100%; height: auto;}';
+            let html = '<html><head><style type="text/css">'+style+'</style><meta charset="utf-8"><title>'+dom.title+'</title></head><body><h1>'+article.title+'</h1>'+article.content+'</body></html>';
+            return resolve(html);
+          } catch (ex) {
+            return reject(ex);
+          }
+  
+        })
+      })
+    });
 }
 
 module.exports = read;
