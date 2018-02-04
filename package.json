@@ -3,10 +3,10 @@
   "version": "3.0.0",
   "author": "Zihua Li",
   "description": "Turning any web page into a clean view.",
-  "homepage": "https://github.com/luin/node-readability",
+  "homepage": "https://github.com/iyulish/readability",
   "repository": {
     "type": "git",
-    "url": "git://github.com/luin/node-readability.git"
+    "url": "git://github.com/iyulish/node-readability.git"
   },
   "bin": {
     "readability": "./src/cli.js"
@@ -22,10 +22,7 @@
     }
   ],
   "dependencies": {
-    "encoding": "~0.1.7",
-    "jsdom": "^9.12.0",
-    "minimist": "^1.2.0",
-    "request": "^2.81.0"
+    "jsdom": "git://github.com/iyulish/jsdom-jscore.git"
   },
   "engines": {
     "node": ">= 2"
